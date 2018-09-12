@@ -1,6 +1,9 @@
 import React, { Component, createRef } from 'react';
 import PropTypes from 'prop-types';
 import {
+  Grid,
+  Row,
+  Col,
   Alert,
   Button,
   FormGroup,
@@ -19,6 +22,17 @@ const users = [
   { name: 'userTwo', value: 2 },
   { name: 'userThree', value: 3 },
 ];
+
+const firstRowStyle = {
+  paddingBottom: 15,
+  minHeight: 35,
+};
+
+const glyphStyle = {
+  position: 'relative',
+  float: 'right',
+  cursor: 'pointer',
+};
 
 class CreateConfigurationForm extends Component {
   constructor(props) {
@@ -54,17 +68,14 @@ class CreateConfigurationForm extends Component {
     const { environmentFields, portFields } = this.state;
 
     return (
-      (
-        name
-        && reference !== '-1'
-        && user !== '-1'
-      )
+      (name && reference !== '-1' && user !== '-1')
         ? {
           name,
           reference,
           user,
           env: environmentFields,
           ports: portFields,
+          kind: 'Configuration',
         }
         : false
     );
@@ -77,6 +88,11 @@ class CreateConfigurationForm extends Component {
       this.formValues.name.current.value = '';
       this.formValues.reference.current.value = '-1';
       this.formValues.user.current.value = '-1';
+
+      this.setState({
+        environmentFields: [],
+        portFields: [],
+      });
     }
 
     this.props.createConfiguration(validatedForm);
@@ -105,6 +121,22 @@ class CreateConfigurationForm extends Component {
     this.setState(portFields);
   }
 
+  removeEnvironment = index => () => {
+    const { environmentFields } = this.state;
+
+    environmentFields.splice(index, 1);
+
+    this.setState({ environmentFields });
+  }
+
+  removePort = index => () => {
+    const { portFields } = this.state;
+
+    portFields.splice(index, 1);
+
+    this.setState({ portFields });
+  }
+
   handleEnvironmentFields = (field, index) => ({ target: { value } }) => {
     const { environmentFields } = this.state;
 
@@ -123,51 +155,85 @@ class CreateConfigurationForm extends Component {
 
   renderEnvironmentList = ({ name, value }, index) => (
     <ListGroupItem key={index}>
-      <FormGroup bsSize={'small'}>
-        <FormControl
-          type={'text'}
-          placeholder={'Name'}
-          value={name}
-          onChange={this.handleEnvironmentFields('name', index)}
-        />
-      </FormGroup>
-      <FormGroup bsSize={'small'} style={{ marginBottom: 0 }}>
-        <FormControl
-          type={'text'}
-          placeholder={'Value'}
-          value={value}
-          onChange={this.handleEnvironmentFields('value', index)}
-        />
-      </FormGroup>
+      <Grid bsClass={'container-fluid'}>
+        <Row style={firstRowStyle}>
+          <Col xs={10}><b>{name}</b></Col>
+          <Col xs={2}>
+            <Glyphicon
+              glyph={'remove'}
+              style={glyphStyle}
+              height={30}
+              onClick={this.removeEnvironment(index)}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <FormGroup bsSize={'small'}>
+              <FormControl
+                type={'text'}
+                placeholder={'Name'}
+                value={name}
+                onChange={this.handleEnvironmentFields('name', index)}
+              />
+            </FormGroup>
+            <FormGroup bsSize={'small'} style={{ marginBottom: 0 }}>
+              <FormControl
+                type={'text'}
+                placeholder={'Value'}
+                value={value}
+                onChange={this.handleEnvironmentFields('value', index)}
+              />
+            </FormGroup>
+          </Col>
+        </Row>
+      </Grid>
     </ListGroupItem>
   )
 
   renderPortList = ({ name, protocol, port }, index) => (
     <ListGroupItem key={index}>
-      <FormGroup bsSize={'small'}>
-        <FormControl
-          type={'text'}
-          placeholder={'Name'}
-          value={name}
-          onChange={this.handlePortFields('name', index)}
-        />
-      </FormGroup>
-      <FormGroup bsSize={'small'}>
-        <FormControl
-          type={'text'}
-          placeholder={'Protocol'}
-          value={protocol}
-          onChange={this.handlePortFields('protocol', index)}
-        />
-      </FormGroup>
-      <FormGroup bsSize={'small'} bsClass={'mb0'}>
-        <FormControl
-          type={'text'}
-          placeholder={'Port'}
-          value={port}
-          onChange={this.handlePortFields('port', index)}
-        />
-      </FormGroup>
+      <Grid bsClass={'container-fluid'}>
+        <Row style={firstRowStyle}>
+          <Col xs={10}><b>{name}</b></Col>
+          <Col xs={2}>
+            <Glyphicon
+              glyph={'remove'}
+              style={glyphStyle}
+              height={30}
+              onClick={this.removePort(index)}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <FormGroup bsSize={'small'}>
+              <FormControl
+                type={'text'}
+                placeholder={'Name'}
+                value={name}
+                onChange={this.handlePortFields('name', index)}
+              />
+            </FormGroup>
+            <FormGroup bsSize={'small'}>
+              <FormControl
+                type={'text'}
+                placeholder={'Protocol'}
+                value={protocol}
+                onChange={this.handlePortFields('protocol', index)}
+              />
+            </FormGroup>
+            <FormGroup bsSize={'small'} bsClass={'mb0'}>
+              <FormControl
+                type={'text'}
+                placeholder={'Port'}
+                value={port}
+                onChange={this.handlePortFields('port', index)}
+              />
+            </FormGroup>
+          </Col>
+        </Row>
+      </Grid>
     </ListGroupItem>
   )
 
